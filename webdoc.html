@@ -71,12 +71,11 @@ var outro = {
 };
 
 var jeu = {
-
 	preload: function() {
 
 		//Chargement des sequences
 		Object.keys(scenario.sequences).forEach(function(seq) {
-			game.load.video(scenario.sequences[seq].id, scenario.sequences[seq].video);
+			game.load.video(seq, scenario.sequences[seq].video);
 		});
 		
 		//chargement des autres ressources pour l'interaction
@@ -91,14 +90,16 @@ var jeu = {
 	playSequence: function(params) {
 
 		//destruction du clip précédent (si existant)
-		if (params.from != undefined) params.from.destroy();
-		var seq = scenario.sequences[params.nextSeq];
+		//if (params.from != undefined) params.from.destroy();
+		game.world.removeAll();
+		game.canvas.style.cursor = "not-allowed";
 		//Chargement et lecture du nouveau clip
-		var vseq = game.add.video(seq.id);
+		var vseq = game.add.video(params.nextSeq);
 		vseq.play(false);
 		var playseq = vseq.addToWorld(0, 0, 0, 0);
-
+		var seq = scenario.sequences[params.nextSeq];
 		vseq.onComplete.add(function() {
+			game.canvas.style.cursor = "default";
 			var yDialogue = 0;
 			if (seq.choix.length != 0) {
 				for (c in seq.choix) {
@@ -116,6 +117,7 @@ var jeu = {
 						interactiveObj.strokeThickness = 5;
 						interactiveObj.anchor.set(0.5,1);
 						interactiveObj.inputEnabled = true;
+						interactiveObj.input.useHandCursor = true;
 						yDialogue += interactiveObj.height + 10;
 					}
 					interactiveObj.events.onInputDown.add(function() {
