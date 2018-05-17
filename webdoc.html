@@ -100,9 +100,9 @@ var jeu = {
 
 		vseq.onComplete.add(function() {
 			var yDialogue = 0;
-			if (seq.choices.length != 0) {
-				for (c in seq.choices) {
-					var choice = seq.choices[c];
+			if (seq.choix.length != 0) {
+				for (c in seq.choix) {
+					var choice = seq.choix[c];
 					var interactiveObj;
 					if (choice.x) {
 						//C'est une boite

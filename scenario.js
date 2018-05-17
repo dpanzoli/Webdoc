@@ -13,7 +13,7 @@ var scenario = {
 		'gommeOuCrayon':{
 			id: 'clip1',
 			video:'clips/seq1.mp4',
-			choices: [
+			choix: [
 				{x:311, y:451, suivant:'gommeErreurPeutPasEffacer'},
 				{x:1028, y:471, suivant: 'crayon'},
 				{dialogue:"J'ai pas compris.", suivant: 'gommeOuCrayon'}  ,
@@ -23,21 +23,21 @@ var scenario = {
 		'gommeErreurPeutPasEffacer':{
 			id: 'clip2',
 			video: 'clips/seq2.mp4',
-			choices:[
+			choix:[
 				{dialogue:"Bon alors montre moi le crayon", suivant: 'crayon'}
 			]
 		},
 		'crayon':{
 			id: 'clip3',
 			video: 'clips/seq3.mp4',
-			choices: [
+			choix: [
 				{x:790, y:567, suivant: 'gomme'}
 			]
 		},
 		'gomme':{
 			id: 'clip4',
 			video: 'clips/seq4.mp4',
-			choices: []
+			choix: []
 		}
 	}
 }
