@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf8">
+<script src="phaser.min.js"></script>
+<script src="scenario.js"></script>
+<script language="javascript">
+
+var game = new Phaser.Game(1280, 720, Phaser.AUTO);
+
+var intro = {
+	
+	preload: function() {
+		if (scenario.intro.musique) 
+			game.load.audio('score', scenario.intro.musique);
+		game.load.image('intro',scenario.intro.image);
+		game.load.spritesheet('commencer','commencer.png',300,91);
+	},
+	create: function() {
+		game.add.image(0, 0, 'intro');
+	
+		var audio = game.add.audio('score');
+		audio.play();
+	
+		var button = game.add.button(
+			scenario.intro.bouton.x, 
+			scenario.intro.bouton.y, 
+			'commencer',null,null,1,0,1,0);
+		button.anchor.set(.5,.5);
+		button.events.onInputDown.add(function() {
+			if (scenario.intro.musique) {
+				fadeOut = game.add.tween(audio);
+				fadeOut.to({volume:0}, 1500, "Linear");
+				fadeOut.onComplete.add(function() {
+					game.state.start('jeu');
+				}, this);
+				fadeOut.start();
+				button.inputEnabled = false;
+			} else {
+				game.state.start('jeu');
+			}
+		}, this);
+	},
+	update: function() {}
+};
+
+var outro = {
+	
+	preload: function() {
+		if (scenario.outro.musique) 
+			game.load.audio('scoreOutro', scenario.outro.musique);
+		game.load.image('outro',scenario.outro.image);
+		game.load.spritesheet('recommencer','recommencer.png',300,91);
+	},
+	create: function() {
+		game.add.image(0, 0, 'outro');
+	
+		var audio = game.add.audio('scoreOutro');
+		audio.play();
+	
+		var button = game.add.button(
+			scenario.outro.bouton.x, 
+			scenario.outro.bouton.y, 
+			'recommencer',null,null,1,0,1,0);
+		button.anchor.set(.5,.5);
+		button.events.onInputDown.add(function() {
+			audio.stop();
+			game.state.start('intro');
+		}, this);
+	},
+	update: function() {}
+};
+
+var jeu = {
+
+	preload: function() {
+
+		//Chargement des sequences
+		Object.keys(scenario.sequences).forEach(function(seq) {
+			game.load.video(scenario.sequences[seq].id, scenario.sequences[seq].video);
+		});
+		
+		//chargement des autres ressources pour l'interaction
+		game.load.image('button','select.png');
+	},
+	
+	create: function() {
+		this.playSequence({nextSeq:'gommeOuCrayon'});
+	},
+	
+	playSequence: function(params) {
+
+		//destruction du clip précédent (si existant)
+		if (params.from != undefined) params.from.destroy();
+		var seq = scenario.sequences[params.nextSeq];
+		//Chargement et lecture du nouveau clip
+		var vseq = game.add.video(seq.id);
+		vseq.play(false);
+		var playseq = vseq.addToWorld(0, 0, 0, 0);
+
+		vseq.onComplete.add(function() {
+			var yDialogue = 0;
+			if (seq.choices.length != 0) {
+				for (c in seq.choices) {
+					var choice = seq.choices[c];
+					var interactiveObj;
+					if (choice.x) {
+						//C'est une boite
+						interactiveObj = game.add.button(choice.x, choice.y, 'button');
+						interactiveObj.anchor.set(.5,.5);
+					}
+					if (choice.dialogue) {
+						//C'est une réplique texte
+						interactiveObj = game.add.text(game.world.centerX, game.world.height-yDialogue, choice.dialogue, { font: 'bold 24pt Arial', fill: 'white', align: 'left'});
+						interactiveObj.stroke = "#000";
+						interactiveObj.strokeThickness = 5;
+						interactiveObj.anchor.set(0.5,1);
+						interactiveObj.inputEnabled = true;
+						yDialogue += interactiveObj.height + 10;
+					}
+					interactiveObj.events.onInputDown.add(function() {
+						jeu.playSequence(this);
+					}, {from: playseq, nextSeq:choice.suivant});
+				}
+			} else {
+				game.state.start('outro');
+			}
+		}, vseq);
+	}
+};
+
+game.state.add('intro', intro);
+game.state.add('outro', outro);
+game.state.add('jeu', jeu);
+
+game.state.start('intro');
+
+</script>
+</html>
+
