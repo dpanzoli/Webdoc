@@ -84,7 +84,8 @@ var jeu = {
 	},
 	
 	create: function() {
-		this.playSequence({nextSeq:'gommeOuCrayon'});
+		var premSeq = Object.keys(scenario.sequences)[0];
+		this.playSequence({nextSeq:premSeq});
 	},
 	
 	playSequence: function(params) {
